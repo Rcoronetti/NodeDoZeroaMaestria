@@ -34,6 +34,7 @@ function operation() {
 
 
         } else if (action === 'Consultar saldo') {
+            getAccountBalance()
 
 
         } else if (action === 'Sacar') {
@@ -83,6 +84,7 @@ function buildAccount() {
             //inicia novo ciclo na criação da conta, o usuário vai escolher novo nome para conta.
             buildAccount()
             return
+
         }// escrevendo arquivo já criado e dando um valor para o mesmo, no caso balance 0
         fs.writeFileSync(
             `accounts/${accountName}.json`,
@@ -94,6 +96,7 @@ function buildAccount() {
             })
 
         console.log(chalk.green('Parabéns a sua conta foi criada!'));
+
         operation()
 
     })
@@ -116,6 +119,22 @@ function deposit() {
             if (!checkAccount(accountName)) {
                 return deposit()
             }
+
+
+            inquirer.prompt([
+                {
+                    name: 'amount',
+                    message: 'Quanto você deseja depositar?',
+
+                }//acessando o array qyue vem de respostas
+            ]).then((answer) => {
+                const amount = answer['amount']
+
+                // add an amount
+                addAmount(accountName, amount)
+                operation()
+
+            }).catch(err => console.log(err))
         })
         .catch(err => console.log(err))
 }
@@ -129,3 +148,40 @@ function checkAccount(accountName) {
     }
     return true
 }
+//aqui consigo pegar a conta em objeto
+function addAmount(accountName, amount) {
+    const accountData = getAccount(accountName)
+
+    //se nao tiver nada pra depositar.
+    console.log(accountData);
+    if (!amount) {
+        console.log(chalk.bgRed.black('Ocorreu um erro, tente novamente mais tarde!'))
+        return deposit()
+    }
+
+    //atribuindo valor
+    accountData.balance = parseFloat(amount) + parseFloat(accountData.balance)
+
+    //salvand0 valor em um arquivo
+    fs.writeFileSync(
+        `accounts/${accountName}.json`,
+        //transformando json em texto
+        JSON.stringify(accountData),
+        function (err) {
+            console.log(err);
+        },
+    )
+    console.log(chalk.green(`Foi depositado o valor de R$:${amount} na sua conta!`))
+
+
+}
+//recebendo o arquivo json em utf-8, para leitura, e retornando json de texto para json.
+function getAccount(accountName) {
+    const accountJSON = fs.readFileSync(`accounts/${accountName}.json`, {
+        encoding: 'utf8',
+        flag: 'r'
+    })
+    return JSON.parse(accountJSON)
+}
+
+//show account balance
