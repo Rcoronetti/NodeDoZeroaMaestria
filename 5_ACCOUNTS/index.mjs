@@ -16,6 +16,7 @@ function operation() {
             'Consultar saldo',
             'Depositar',
             'Sacar',
+            'Transferir',
             'Sair'
         ],
     },
@@ -41,10 +42,13 @@ function operation() {
             withdraw()
 
 
+        } else if (action === 'Transferir') {
+            transfer()
+
+
         } else if (action === 'Sair') {
             console.log(chalk.bgBlue.black('Obrigado por usar o Accounts!'))
             process.exit()
-
         }
 
         //aqui vamos ver a escolha do usuário.
@@ -135,6 +139,7 @@ function deposit() {
                 addAmount(accountName, amount)
                 operation()
 
+
             }).catch(err => console.log(err))
         })
         .catch(err => console.log(err))
@@ -157,7 +162,7 @@ function addAmount(accountName, amount) {
     console.log(accountData);
     if (!amount) {
         console.log(chalk.bgRed.black('Ocorreu um erro, tente novamente mais tarde!'))
-        return deposit()
+        return operation()
     }
 
     //atribuindo valor
@@ -185,7 +190,7 @@ function getAccount(accountName) {
     return JSON.parse(accountJSON)
 }
 
-//withdraw an amountform user account
+//withdraw an amoun for user account
 function withdraw() {
     inquirer.prompt([{
         name: 'accountName',
@@ -217,12 +222,12 @@ function removeAmount(accountName, amount) {
 
     if (!amount) {
         console.log(chalk.bgRed.black('Ocorreu um erro, tente novamente!'));
-        return withdraw()
+        return operation()
     }
 
     if (accountData.balance < amount) {
         console.log(chalk.bgRed.black('Valor indisponível!'))
-        return withdraw()
+        return operation()
 
     }
 
@@ -263,3 +268,81 @@ function getAccountBalance() {
         operation()
     }).catch(err => console.log(err))
 }
+
+//transfer an amount between accounts
+function transfer() {
+    //conta de origem
+    inquirer.prompt([
+        {
+            name: 'accountName',
+            message: 'Qual o nome da conta de origem?'
+
+        }
+    ]).then((answer) => {
+        const accountName = answer['accountName']
+
+        // verificando se conta origem existe
+        if (!checkAccount(accountName)) {
+            return transfer()
+        }
+
+        //conta de destino
+        inquirer.prompt([
+            {
+                name: 'accountNameDestiny',
+                message: 'Qual a conta de destino?'
+            }
+        ]).then((answer) => {
+            const accountNameDestiny = answer['accountNameDestiny']
+
+            //verificando se conta  destino existe
+            if (!checkAccount(accountNameDestiny)) {
+                return transfer()
+            }
+
+            inquirer.prompt([
+                {
+                    name: 'amount',
+                    message: 'Quanto você deseja depositar?',
+
+                }//acessando o array qyue vem de respostas
+            ]).then((answer) => {
+                const amount = answer['amount']
+                const accountData = getAccount(accountName)
+
+                //remov an amount from origin
+                removeAmount(accountName, amount)
+
+                if (accountData.balance >= amount) {
+
+                    addAmount(accountNameDestiny, amount)
+
+                }
+
+
+
+            }).catch(err => console.log(err))
+
+        }).catch((err) => console.log(err))
+    }).catch((err) => console.log(err))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //transferindo valor
+
+}
+
+
+
+
