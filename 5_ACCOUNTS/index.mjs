@@ -326,21 +326,6 @@ function transfer() {
         }).catch((err) => console.log(err))
     }).catch((err) => console.log(err))
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //transferindo valor
-
 }
 
 
