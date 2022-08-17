@@ -1,0 +1,4 @@
+Para remover itens utilizando o método destroy;
+A função vai ficar bem parecida com a de resgatar um usuário;
+Só que será um POST, e que efetua a remoção, depois redirecionamos;
+Precisamos também criar um formulário no front-end;
